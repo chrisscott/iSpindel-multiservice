@@ -1,0 +1,42 @@
+{
+  "name": "ispindel-multiservice",
+  "version": "1.0.0",
+  "description": "Send iSpindel data to multiple services",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "npx tsc -p tsconfig.json",
+    "prebuild": "rimraf build",
+    "start": "node build/index.js",
+    "dev": "nodemon"
+  },
+  "keywords": [
+    "ispindel",
+    "homebrewing"
+  ],
+  "author": "Chris Scott",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "0.20.0",
+    "dotenv": "8.2.0",
+    "envsub": "4.0.7",
+    "fastify": "3.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "14.6.4",
+    "@typescript-eslint/eslint-plugin": "4.1.0",
+    "@typescript-eslint/parser": "4.1.0",
+    "eslint": "7.8.1",
+    "eslint-config-airbnb-typescript": "10.0.0",
+    "eslint-plugin-import": "2.22.0",
+    "nodemon": "2.0.4",
+    "rimraf": "3.0.2",
+    "typescript": "4.0.2"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "."
+    ],
+    "exec": "npm run-script build && npm start",
+    "ext": "ts"
+  }
+}

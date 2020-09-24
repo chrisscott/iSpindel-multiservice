@@ -1,0 +1,22 @@
+{
+  "serverPath": "/mySpindel",
+  "services": [
+    {
+      "type": "ubidots",
+      "deviceLabel": "iSpindel",
+      "token": "${UBIDOTS_TOKEN}"
+    },
+    {
+      "type": "http",
+      "deviceLabel": "${GRAINFATHER_LABEL}",
+      "url": "http://community.grainfather.com/iot/${GRAINFATHER_ID}/ispindel"
+    },
+    {
+      "type": "http",
+      "url": "https://api.example.com/v1/data",
+      "headers" : {
+        "X-Requested-With": "iSpindel Multiservice"
+      }
+    }
+  ]
+}

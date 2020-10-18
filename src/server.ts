@@ -7,6 +7,8 @@ export default async (): Promise<void> => {
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
   const config = await getConfig();
   if (config instanceof Error) {
+    console.log(config);
+    process.exit(1);
     return;
   }
 

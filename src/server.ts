@@ -1,5 +1,6 @@
 import fastify from 'fastify';
 import getConfig from './config';
+import debug from './services/debug';
 import ubidots from './services/ubidots';
 import httpHook from './services/http';
 
@@ -14,8 +15,11 @@ export default async (): Promise<void> => {
 
   const { serverPath } = config;
 
-  const server = fastify({ logger: true });
+  const server = fastify({
+    logger: { level: process.env.ISMS_DEBUG ? 'debug' : 'info' },
+  });
 
+  server.addHook('onResponse', debug);
   server.addHook('onResponse', ubidots);
   server.addHook('onResponse', httpHook);
 

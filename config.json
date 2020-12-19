@@ -14,6 +14,10 @@
     {
       "type": "http",
       "url": "https://log.brewersfriend.com/ispindel/4fb92273d17466924fbdf3ec0068df751d77bd68"
+    },
+    {
+      "type": "http",
+      "url": "http://log.brewfather.net/ispindel?id=wYgPkVLxMtNeiB"
     }
   ]
 }

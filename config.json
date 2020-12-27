@@ -17,6 +17,7 @@
     },
     {
       "type": "http",
+      "deviceLabel":"459049[SG]",
       "url": "http://log.brewfather.net/ispindel?id=wYgPkVLxMtNeiB"
     }
   ]

@@ -37,7 +37,7 @@ export default async (): Promise<void> => {
   };
 
   server.get(serverPath, async () => 'hi there');
-  server.post(serverPath, opts, async (request) => request.body);
+  server.post(serverPath, opts, async () => 'ok');
 
   server.listen(port, '0.0.0.0', (err) => {
     if (err) {

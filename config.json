@@ -19,6 +19,12 @@
       "type": "http",
       "deviceLabel": "iSpindel [SG]",
       "url": "http://log.brewfather.net/ispindel?id=wYgPkVLxMtNeiB"
+    },
+    {
+      "type": "homeassistant",
+      "url": "${HOMEASSISTANT_URL}",
+      "token": "${HOMEASSISTANT_TOKEN}",
+      "deviceLabel": "iSpindel"
     }
   ]
 }

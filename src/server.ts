@@ -3,6 +3,7 @@ import getConfig from './config';
 import debug from './services/debug';
 import ubidots from './services/ubidots';
 import httpHook from './services/http';
+import homeAssistant from './services/homeassistant';
 
 export default async (): Promise<void> => {
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
@@ -22,6 +23,7 @@ export default async (): Promise<void> => {
   server.addHook('onResponse', debug);
   server.addHook('onResponse', ubidots);
   server.addHook('onResponse', httpHook);
+  server.addHook('onResponse', homeAssistant);
 
   const opts = {
     schema: {
@@ -43,7 +45,7 @@ export default async (): Promise<void> => {
   };
 
   server.get(serverPath, async () => 'hi there');
-  server.post(serverPath, opts, async (request) => request.body);
+  server.post(serverPath, opts, async () => 'ok');
 
   server.listen(port, '0.0.0.0', (err) => {
     if (err) {

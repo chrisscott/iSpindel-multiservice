@@ -2,6 +2,7 @@ import fastify from 'fastify';
 import getConfig from './config';
 import ubidots from './services/ubidots';
 import httpHook from './services/http';
+import homeAssistant from './services/homeassistant';
 
 export default async (): Promise<void> => {
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
@@ -16,6 +17,7 @@ export default async (): Promise<void> => {
 
   server.addHook('onResponse', ubidots);
   server.addHook('onResponse', httpHook);
+  server.addHook('onResponse', homeAssistant);
 
   const opts = {
     schema: {

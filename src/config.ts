@@ -5,7 +5,7 @@ interface Service {
   deviceLabel?: string;
   token?: string;
   url?: string;
-  headers?: {[key: string]: string}
+  headers?: { [key: string]: string }
 }
 
 export interface Config {

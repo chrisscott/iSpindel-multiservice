@@ -21,16 +21,11 @@ export default async (request: FastifyRequest): Promise<void> => {
   } = data;
 
   services.forEach(async (service) => {
-    const { deviceLabel: name = data.name, url, headers = undefined } = service;
+    const { deviceLabel: name = data.name, url, token } = service;
     const axiosConfig: AxiosRequestConfig = {};
     if (!url) {
       request.log.error(`'url' not set for Home Assistant service ${name}. Data not sent.`);
       return;
-    }
-
-    // payload.name = name;
-    if (headers) {
-      axiosConfig.headers = headers;
     }
 
     try {
@@ -45,7 +40,9 @@ export default async (request: FastifyRequest): Promise<void> => {
       const { status, data: resData } = await axios.post(
         `${url}/api/states/sensor.${name}_temp`,
         payload,
-        axiosConfig,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
 
       // eslint-disable-next-line no-console

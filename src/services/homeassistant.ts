@@ -61,8 +61,8 @@ export default async (request: FastifyRequest): Promise<void> => {
     } = data;
 
     postData(url, deviceLabel, 'temperature', temperature, '°F', token, axiosConfig);
-    postData(url, deviceLabel, 'battery', battery, 'V', token, axiosConfig);
+    postData(url, deviceLabel, 'battery', battery, 'Volts', token, axiosConfig);
     postData(url, deviceLabel, 'gravity', gravity, 'SG', token, axiosConfig);
-    postData(url, deviceLabel, 'angle', angle, '°', token, axiosConfig);
+    postData(url, deviceLabel, 'angle', angle, 'Degrees', token, axiosConfig);
   });
 };

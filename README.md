@@ -35,7 +35,7 @@ When run the server would listen on the path `/mySpindel` and forward the iSpind
   * `url` (required) - the URL to send to
   * `deviceLabel` (optional) - rename the device from what is configured in the iSpindel. Used for services like GrainFather which require a specific device name.
   * `headers` (optional) - a key-value object of headers and header values to send with the request
-  * `token` (optional) - the API token to send in the request for supported services (currently only used for `ubidots`)
+  * `token` (optional) - the API token to send in the request for supported services (currently only used for `ubidots` and `homeassistant`)
 
 ### Using Environment Variables in `config.json`
 

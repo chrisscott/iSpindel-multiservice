@@ -22,12 +22,8 @@ interface EnvsubResult {
 
 const templateFile = `${__dirname}/../config.json`;
 
-export default async (): Promise<Config | Error> => {
-  try {
-    const result: EnvsubResult = await envsub({ templateFile, outputFile: '/dev/null' });
-    const config: Config = JSON.parse(result.outputContents);
-    return config;
-  } catch (err) {
-    return err;
-  }
+export default async (): Promise<Config> => {
+  const result: EnvsubResult = await envsub({ templateFile, outputFile: '/dev/null' });
+  const config: Config = JSON.parse(result.outputContents);
+  return config;
 };

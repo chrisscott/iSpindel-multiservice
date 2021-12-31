@@ -4,12 +4,20 @@ import getConfig from '../config';
 import { IspindelData } from '../index.d';
 
 export default async (request: FastifyRequest): Promise<void> => {
+  if (request.is404 || request.method === 'GET') {
+    return;
+  }
+  
   const config = await getConfig();
   if (config instanceof Error) {
     return;
   }
 
   const services = config.services.filter((service) => service.type === 'homeassistant');
+  if (services.length === 0) {
+    return;
+  }
+  
   const data: IspindelData = request.body as IspindelData;
 
   const postData = async (
@@ -42,7 +50,7 @@ export default async (request: FastifyRequest): Promise<void> => {
       // eslint-disable-next-line no-console
       request.log.info(resData, `${status} response from ${url}`);
     } catch (err) {
-      request.log.error(err.response.data, `Error from homeassistant at ${url} for device ${name}`);
+      request.log.error(err, `Error from homeassistant at ${url} for device ${name}`);
     }
   };
 

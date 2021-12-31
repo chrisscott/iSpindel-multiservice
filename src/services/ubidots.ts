@@ -13,12 +13,20 @@ interface UbiDotsData {
 }
 
 export default async (request: FastifyRequest): Promise<void> => {
+  if (request.is404 || request.method === 'GET') {
+    return;
+  }
+  
   const config = await getConfig();
   if (config instanceof Error) {
     return;
   }
 
   const services = config.services.filter((service) => service.type === 'ubidots');
+  if (services.length === 0) {
+    return;
+  }
+
   const data: IspindelData = request.body as IspindelData;
 
   const {
@@ -56,7 +64,7 @@ export default async (request: FastifyRequest): Promise<void> => {
         },
       );
     } catch (err) {
-      request.log.error(err.response.data, `Ubidots error for device ${name}`);
+      request.log.error(err, `Ubidots error for device ${name}`);
     }
   });
 };

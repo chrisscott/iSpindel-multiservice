@@ -4,12 +4,20 @@ import getConfig from '../config';
 import { IspindelData } from '../index.d';
 
 export default async (request: FastifyRequest): Promise<void> => {
+  if (request.is404 || request.method === 'GET') {
+    return;
+  }
+
   const config = await getConfig();
   if (config instanceof Error) {
     return;
   }
 
   const services = config.services.filter((service) => service.type === 'http');
+  if (services.length === 0) {
+    return;
+  }
+
   const payload: IspindelData = request.body as IspindelData;
 
   services.forEach(async (service) => {
@@ -35,7 +43,7 @@ export default async (request: FastifyRequest): Promise<void> => {
       // eslint-disable-next-line no-console
       request.log.info(resData, `${status} response from ${url}`);
     } catch (err) {
-      request.log.error(err.response.data, `http error from ${url} for device ${name}`);
+      request.log.error(err, `http error from ${url} for device ${name}`);
     }
   });
 };

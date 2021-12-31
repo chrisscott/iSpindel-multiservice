@@ -7,14 +7,15 @@ import homeAssistant from './services/homeassistant';
 
 export default async (): Promise<void> => {
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
-  const config = await getConfig();
-  if (config instanceof Error) {
-    console.log(config);
+  let config;
+  try {
+    config = await getConfig();
+  } catch ( err) {
+    console.log(err);
     process.exit(1);
-    return;
   }
 
-  const { serverPath } = config;
+  const { serverPath = '/' } = config;
 
   const server = fastify({
     logger: { level: process.env.ISMS_DEBUG ? 'debug' : 'info' },
@@ -44,8 +45,8 @@ export default async (): Promise<void> => {
     },
   };
 
-  server.get(serverPath, async () => 'hi there');
-  server.post(serverPath, opts, async () => 'ok');
+  server.get(serverPath, async () => {return { status: '🍺' };});
+  server.post(serverPath, opts, async () => {return { status: '🍺🍺🍺' };});
 
   server.listen(port, '0.0.0.0', (err) => {
     if (err) {

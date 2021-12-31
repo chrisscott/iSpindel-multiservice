@@ -17,6 +17,12 @@
       "headers": {
         "X-Requested-With": "iSpindel Multiservice"
       }
+    },
+    {
+      "type": "homeassistant",
+      "url": "${HOMEASSISTANT_URL}",
+      "token": "${HOMEASSISTANT_TOKEN}",
+      "deviceLabel": "iSpindel"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # iSpindel Multiservice
 
-Send your iSpindel data to multiple services.
+Send your [iSpindel](https://www.ispindel.de/docs/README_en.html) data to multiple services like [Ubidots](http://help.ubidots.com/en/articles/3979278-connect-the-ispindel-low-cost-diy-hydrometer-with-ubidots), [Brewfather](https://docs.brewfather.app/integrations/ispindel), [Grainfather](https://grainfather.com/), [Brewers Friend](https://www.brewersfriend.com/), [Home Assistant](https://www.home-assistant.io/), and more.
 
 # Usage
 
@@ -31,6 +31,7 @@ When run the server would listen on the path `/mySpindel` and forward the iSpind
   * `type` (required) - one of:
     * `http` - the main service which can be used to send data over HTTP or HTTPS:
     * `ubidots` - Ubidots
+    * `homeassistant` - Home Assistant
   * `url` (required) - the URL to send to
   * `deviceLabel` (optional) - rename the device from what is configured in the iSpindel. Used for services like GrainFather which require a specific device name.
   * `headers` (optional) - a key-value object of headers and header values to send with the request
@@ -85,8 +86,8 @@ Provides a service you can point your iSpindel to which then forwards the data t
 
 ## Why would I need it?
 
-* You have an iSpindel and want to send data to Ubidots, Grainfather, Brewers Friend, a custom HTTP service, or more. 
-* You want to send iSpindel data to a service that only supports HTTPS
+* You have an iSpindel and want to send data to Ubidots, Grainfather, Brewers Friend, a custom HTTP service, Home Assistant or more. 
+* You want to send iSpindel data to a service that only supports HTTPS,
 
 ## Which services are supported?
 
@@ -94,5 +95,6 @@ Currently, the following:
 * HTTP - any HTTP or HTTPS endpoint
   * Header-based token authentication is supported
 * Ubidots
+* Home Assistant
 
 If there is a service missing you'd like to see, please [submit an issue](/issue/new) with the details.

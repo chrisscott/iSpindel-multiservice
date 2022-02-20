@@ -1,6 +1,6 @@
 import { FastifyRequest } from 'fastify';
 import axios, { AxiosRequestConfig } from 'axios';
-import getConfig from '../config';
+import getConfig, { ServiceTypes } from '../config';
 import { IspindelData } from '../index.d';
 
 export default async (request: FastifyRequest): Promise<void> => {
@@ -9,11 +9,11 @@ export default async (request: FastifyRequest): Promise<void> => {
   }
 
   const config = await getConfig();
-  if (config instanceof Error  || !config.services) {
+  if (config instanceof Error || !config.services) {
     return;
   }
 
-  const services = config.services.filter((service) => service.type === 'http');
+  const services = config.services.filter((service) => service.type === ServiceTypes.HTTP);
   if (services.length === 0) {
     return;
   }

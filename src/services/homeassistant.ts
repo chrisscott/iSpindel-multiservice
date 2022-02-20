@@ -1,23 +1,25 @@
 import { FastifyRequest } from 'fastify';
 import axios, { AxiosRequestConfig } from 'axios';
-import getConfig from '../config';
+import getConfig, { ServiceTypes } from '../config';
 import { IspindelData } from '../index.d';
 
 export default async (request: FastifyRequest): Promise<void> => {
   if (request.is404 || request.method === 'GET') {
     return;
   }
-  
+
   const config = await getConfig();
-  if (config instanceof Error  || !config.services) {
+  if (config instanceof Error || !config.services) {
     return;
   }
 
-  const services = config.services.filter((service) => service.type === 'homeassistant');
+  const services = config.services.filter(
+    (service) => service.type === ServiceTypes.HomeAssisstant,
+  );
   if (services.length === 0) {
     return;
   }
-  
+
   const data: IspindelData = request.body as IspindelData;
 
   const postData = async (

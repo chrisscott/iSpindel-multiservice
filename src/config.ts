@@ -1,11 +1,17 @@
 /// <reference types="./envsub" />
 import envsub from 'envsub';
 
+export enum ServiceTypes {
+  Ubidots,
+  HTTP,
+  HomeAssisstant,
+}
+
 interface Service {
-  type: string;
+  type: ServiceTypes;
   deviceLabel?: string;
   token?: string;
-  url?: string;
+  url: string;
   headers?: { [key: string]: string }
 }
 
@@ -21,10 +27,8 @@ interface EnvsubResult {
   outputContents: string;
 }
 
-const templateFile = `${__dirname}/../config.json`;
-
-export default async (): Promise<Config> => {
+export default async (templateFile = `${__dirname}/../config.json`): Promise<Config> => {
   const result: EnvsubResult = await envsub({ templateFile, outputFile: '/dev/null' });
-  const config: Config = JSON.parse(result.outputContents);
+  const config = JSON.parse(result.outputContents) as Config;
   return config;
 };

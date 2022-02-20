@@ -9,7 +9,7 @@ export default async (request: FastifyRequest): Promise<void> => {
   }
   
   const config = await getConfig();
-  if (config instanceof Error) {
+  if (config instanceof Error  || !config.services) {
     return;
   }
 

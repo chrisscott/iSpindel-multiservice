@@ -1,3 +1,4 @@
+/// <reference types="./envsub" />
 import envsub from 'envsub';
 
 interface Service {
@@ -9,8 +10,8 @@ interface Service {
 }
 
 export interface Config {
-  serverPath: string;
-  services: [Service];
+  serverPath?: string;
+  services?: [Service];
 }
 
 interface EnvsubResult {

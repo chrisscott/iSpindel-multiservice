@@ -13,7 +13,7 @@ export default async (opts: AppOptions) => {
   let config;
   try {
     config = opts.config || await getConfig();
-  } catch ( err) {
+  } catch (err) {
     console.log(err);
     process.exit(1);
   }
@@ -26,8 +26,8 @@ export default async (opts: AppOptions) => {
   app.addHook('onResponse', httpHook);
   app.addHook('onResponse', homeAssistant);
 
-  app.get(serverPath, async () => {return { status: '🍺' };});
-  app.post(serverPath, opts, async () => {return { status: '🍺🍺🍺' };});
+  app.get(serverPath, async () => ({ status: '🍺' }));
+  app.post(serverPath, opts, async () => ({ status: '🍺🍺🍺' }));
 
   return app;
 };

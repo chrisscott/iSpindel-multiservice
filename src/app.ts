@@ -14,6 +14,7 @@ export default async (opts: AppOptions) => {
   try {
     config = opts.config || await getConfig();
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.log(err);
     process.exit(1);
   }

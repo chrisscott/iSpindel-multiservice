@@ -1,14 +1,14 @@
 /// <reference types="./envsub" />
 import envsub from 'envsub';
 
-export enum ServiceTypes {
+export enum ServiceType {
   Ubidots,
   HTTP,
   HomeAssisstant,
 }
 
-interface Service {
-  type: ServiceTypes;
+export interface Service {
+  type: ServiceType;
   deviceLabel?: string;
   token?: string;
   url: string;

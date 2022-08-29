@@ -38,5 +38,6 @@
     ],
     "exec": "npm run-script build && npm start",
     "ext": "ts"
-  }
+  },
+  "packageManager": "yarn@3.2.3"
 }

@@ -4,9 +4,9 @@
   "description": "Send iSpindel data to multiple services",
   "main": "build/index.js",
   "scripts": {
-    "build": "npx tsc -p tsconfig.json",
-    "prebuild": "rimraf build",
-    "start": "node build/index.js",
+    "build": "yarn tsc -p tsconfig.json",
+    "prebuild": "yarn rimraf build",
+    "start": "yarn build && node build/index.js",
     "dev": "nodemon"
   },
   "keywords": [

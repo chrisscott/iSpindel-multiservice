@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "build": "yarn tsc -p tsconfig.json",
-    "prebuild": "yarn rimraf build",
+    "prebuild": "rimraf build",
     "start": "yarn build && node build/index.js",
     "dev": "nodemon"
   },

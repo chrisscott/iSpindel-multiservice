@@ -1,18 +1,21 @@
 import { FastifyRequest } from 'fastify';
-import axios, { AxiosRequestConfig } from 'axios';
-import getServices from '../getServices';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import getConfig, { Service } from '../config';
 import { IspindelData } from '../index.d';
-import { ServiceType } from '../config';
+import isAxiosError from '../helpers';
 
 export default async (request: FastifyRequest): Promise<void> => {
-  const services = await getServices(request, ServiceType.HTTP);
-  if (!services) {
+  const config = await getConfig();
+  if (!config) {
     return;
   }
 
+  const services = config.services.filter((service: Service) => service.type === 'http');
   const payload: IspindelData = request.body as IspindelData;
 
-  services.forEach(async (service) => {
+  // eslint-disable-next-line max-len
+  services.forEach(async (service: Service) => {
     const { deviceLabel: name = payload.name, url, headers = undefined } = service;
     const axiosConfig: AxiosRequestConfig = {};
     if (!url) {
@@ -34,8 +37,13 @@ export default async (request: FastifyRequest): Promise<void> => {
       );
       // eslint-disable-next-line no-console
       request.log.info(resData, `${status} response from ${url}`);
-    } catch (err) {
-      request.log.error(err, `http error from ${url} for device ${name}`);
+    } catch (err: unknown | AxiosError) {
+      if (isAxiosError(err) && err.response) {
+        request.log.error(err.response.data, `http error from ${url} for device ${name}`);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(err);
+      }
     }
   });
 };

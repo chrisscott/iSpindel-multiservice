@@ -3,7 +3,7 @@
   "services": [
     {
       "type": "http",
-      "deviceLabel": "iSpindel [SG]",
+      "deviceLabel": "iSpindel SG",
       "url": "http://log.brewfather.net/ispindel?id=${BREWFATHER_ID}"
     },
     {

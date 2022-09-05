@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import fastify from 'fastify';
 import getConfig from './config';
 import debug from './services/debug';
@@ -9,9 +10,9 @@ export default async (): Promise<void> => {
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
   const config = await getConfig();
   if (config instanceof Error) {
+    console.log('Error parsing config. Dumping config...');
     console.log(config);
     process.exit(1);
-    return;
   }
 
   const { serverPath } = config;

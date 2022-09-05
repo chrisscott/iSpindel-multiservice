@@ -1,7 +1,9 @@
 import { FastifyRequest } from 'fastify';
-import axios from 'axios';
-import getConfig from '../config';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import axios, { AxiosError } from 'axios';
+import getConfig, { Service } from '../config';
 import { IspindelData } from '../index.d';
+import isAxiosError from '../helpers';
 
 interface UbiDotsData {
   tilt: number;
@@ -14,11 +16,11 @@ interface UbiDotsData {
 
 export default async (request: FastifyRequest): Promise<void> => {
   const config = await getConfig();
-  if (config instanceof Error) {
+  if (!config) {
     return;
   }
 
-  const services = config.services.filter((service) => service.type === 'ubidots');
+  const services = config.services.filter((service: Service) => service.type === 'ubidots');
   const data: IspindelData = request.body as IspindelData;
 
   const {
@@ -38,7 +40,7 @@ export default async (request: FastifyRequest): Promise<void> => {
     RSSI,
   };
 
-  services.forEach(async (service) => {
+  services.forEach(async (service: Service) => {
     const { deviceLabel: name = data.name, token } = service;
 
     if (!token) {
@@ -55,8 +57,13 @@ export default async (request: FastifyRequest): Promise<void> => {
           headers: { 'X-Auth-Token': token },
         },
       );
-    } catch (err) {
-      request.log.error(err.response.data, `Ubidots error for device ${name}`);
+    } catch (err: unknown | AxiosError) {
+      if (isAxiosError(err) && err.response) {
+        request.log.error(err.response.data, `Ubidots error for device ${name}`);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(err);
+      }
     }
   });
 };

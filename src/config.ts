@@ -1,6 +1,6 @@
 import envsub from 'envsub';
 
-interface Service {
+export interface Service {
   type: string;
   deviceLabel?: string;
   token?: string;
@@ -22,12 +22,12 @@ interface EnvsubResult {
 
 const templateFile = `${__dirname}/../config.json`;
 
-export default async (): Promise<Config | Error> => {
+export default async (): Promise<Config | null> => {
   try {
     const result: EnvsubResult = await envsub({ templateFile, outputFile: '/dev/null' });
     const config: Config = JSON.parse(result.outputContents);
     return config;
   } catch (err) {
-    return err;
+    return null;
   }
 };

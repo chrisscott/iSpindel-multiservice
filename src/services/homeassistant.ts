@@ -1,15 +1,17 @@
 import { FastifyRequest } from 'fastify';
-import axios, { AxiosRequestConfig } from 'axios';
-import getConfig from '../config';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import getConfig, { Service } from '../config';
 import { IspindelData } from '../index.d';
+import isAxiosError from '../helpers';
 
 export default async (request: FastifyRequest): Promise<void> => {
   const config = await getConfig();
-  if (config instanceof Error) {
+  if (!config) {
     return;
   }
 
-  const services = config.services.filter((service) => service.type === 'homeassistant');
+  const services = config.services.filter((service: Service) => service.type === 'homeassistant');
   const data: IspindelData = request.body as IspindelData;
 
   const postData = async (
@@ -41,12 +43,17 @@ export default async (request: FastifyRequest): Promise<void> => {
       );
       // eslint-disable-next-line no-console
       request.log.info(resData, `${status} response from ${url}`);
-    } catch (err) {
-      request.log.error(err.response.data, `Error from homeassistant at ${url} for device ${name}`);
+    } catch (err: unknown | AxiosError) {
+      if (isAxiosError(err) && err.response) {
+        request.log.error(err.response.data, `Error from homeassistant at ${url} for device ${deviceLabel}`);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(err);
+      }
     }
   };
 
-  services.forEach(async (service) => {
+  services.forEach(async (service: Service) => {
     const { deviceLabel = data.name, url, token } = service;
     const axiosConfig: AxiosRequestConfig = {};
     if (!url) {

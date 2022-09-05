@@ -7,7 +7,7 @@ import isAxiosError from '../helpers';
 
 export default async (request: FastifyRequest): Promise<void> => {
   const config = await getConfig();
-  if (!config) {
+  if (!config || !request.body) {
     return;
   }
 

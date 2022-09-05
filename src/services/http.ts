@@ -49,7 +49,7 @@ export default async (request: FastifyRequest): Promise<void> => {
       return;
     }
 
-    // payload.name = name;
+    payload.name = name;
     if (headers) {
       axiosConfig.headers = headers;
     }

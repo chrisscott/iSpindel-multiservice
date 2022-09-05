@@ -14,8 +14,34 @@ export default async (request: FastifyRequest): Promise<void> => {
   const services = config.services.filter((service: Service) => service.type === 'http');
   const payload: IspindelData = request.body as IspindelData;
 
+  const postData = async (
+    url: string,
+    deviceLabel: string,
+    data: IspindelData,
+    axiosConfig: AxiosRequestConfig,
+  ) => {
+    try {
+      request.log.info(`Sending data to ${url} for device ${deviceLabel} `);
+      const { status, data: resData } = await axios.post(
+        url,
+        data,
+        axiosConfig,
+      );
+      // eslint-disable-next-line no-console
+      request.log.info(resData, `${status} response from ${url}`);
+    } catch (err: unknown | AxiosError) {
+      if (isAxiosError(err) && err.response) {
+        request.log.error(err.response.data, `http error from ${url} for device ${deviceLabel}`);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(err);
+      }
+    }
+  };
+
   // eslint-disable-next-line max-len
-  services.forEach(async (service: Service) => {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const service of services) {
     const { deviceLabel: name = payload.name, url, headers = undefined } = service;
     const axiosConfig: AxiosRequestConfig = {};
     if (!url) {
@@ -23,27 +49,10 @@ export default async (request: FastifyRequest): Promise<void> => {
       return;
     }
 
-    payload.name = name;
+    // payload.name = name;
     if (headers) {
       axiosConfig.headers = headers;
     }
-
-    try {
-      request.log.info(`Sending data to ${url} for device ${name} `);
-      const { status, data: resData } = await axios.post(
-        url,
-        payload,
-        axiosConfig,
-      );
-      // eslint-disable-next-line no-console
-      request.log.info(resData, `${status} response from ${url}`);
-    } catch (err: unknown | AxiosError) {
-      if (isAxiosError(err) && err.response) {
-        request.log.error(err.response.data, `http error from ${url} for device ${name}`);
-      } else {
-        // eslint-disable-next-line no-console
-        console.log(err);
-      }
-    }
-  });
+    postData(url, name, payload, axiosConfig);
+  }
 };

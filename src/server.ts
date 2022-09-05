@@ -45,7 +45,9 @@ export default async (): Promise<void> => {
     },
   };
 
-  const server = await app(opts);
+  server.get('/', async () => '🍺');
+  server.get(serverPath, async () => 'Data should be POSTed to this endpoint');
+  server.post(serverPath, opts, async () => 'ok');
 
   server.listen(port, '0.0.0.0', (err) => {
     if (err) {

@@ -10,8 +10,7 @@ export default async (): Promise<void> => {
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
   const config = await getConfig();
   if (!config?.serverPath) {
-    console.log('Error parsing config. Dumping config...');
-    console.log(config);
+    console.log('Error parsing config. Check for syntax errors.');
     process.exit(1);
   }
 

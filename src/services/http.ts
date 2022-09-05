@@ -42,14 +42,14 @@ export default async (request: FastifyRequest): Promise<void> => {
   // eslint-disable-next-line max-len
   // eslint-disable-next-line no-restricted-syntax
   for (const service of services) {
-    const { deviceLabel: name = payload.name, url, headers = undefined } = service;
+    const { url, headers = undefined } = service;
+    const { name } = payload;
     const axiosConfig: AxiosRequestConfig = {};
     if (!url) {
       request.log.error(`'url' not set for http service ${name}. Data not sent.`);
       return;
     }
 
-    payload.name = name;
     if (headers) {
       axiosConfig.headers = headers;
     }

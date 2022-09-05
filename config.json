@@ -2,18 +2,9 @@
   "serverPath": "/brew",
   "services": [
     {
-      "type": "ubidots",
-      "deviceLabel": "iSpindel",
-      "token": "${UBIDOTS_TOKEN}"
-    },
-    {
       "type": "http",
       "deviceLabel": "459049,SG",
       "url": "http://community.grainfather.com/iot/boyo-baud/ispindel"
-    },
-    {
-      "type": "http",
-      "url": "https://log.brewersfriend.com/ispindel/4fb92273d17466924fbdf3ec0068df751d77bd68"
     },
     {
       "type": "http",

@@ -53,11 +53,13 @@ export default async (request: FastifyRequest): Promise<void> => {
     }
   };
 
-  services.forEach(async (service: Service) => {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const service of services) {
     const { deviceLabel = data.name, url, token } = service;
     const axiosConfig: AxiosRequestConfig = {};
     if (!url) {
       request.log.error(`'url' not set for homeassistant service ${deviceLabel}. Data not sent.`);
+      break;
     }
 
     const {
@@ -71,5 +73,5 @@ export default async (request: FastifyRequest): Promise<void> => {
     postData(url, deviceLabel, 'battery', battery, 'Volts', token, axiosConfig);
     postData(url, deviceLabel, 'gravity', gravity, 'SG', token, axiosConfig);
     postData(url, deviceLabel, 'angle', angle, 'Degrees', token, axiosConfig);
-  });
+  }
 };

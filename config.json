@@ -3,11 +3,6 @@
   "services": [
     {
       "type": "http",
-      "deviceLabel": "459049,SG",
-      "url": "http://community.grainfather.com/iot/${GRAINFATHER_SLUG}/ispindel"
-    },
-    {
-      "type": "http",
       "deviceLabel": "iSpindel [SG]",
       "url": "http://log.brewfather.net/ispindel?id=${BREWFATHER_ID}"
     },

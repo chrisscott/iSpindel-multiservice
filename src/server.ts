@@ -1,10 +1,31 @@
-import app from './app';
+/* eslint-disable no-console */
+import fastify from 'fastify';
+import getConfig from './config';
+import debug from './services/debug';
+import ubidots from './services/ubidots';
+import httpHook from './services/http';
+import homeAssistant from './services/homeassistant';
 
 export default async (): Promise<void> => {
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
+  const config = await getConfig();
+  if (!config?.serverPath) {
+    console.log('Error parsing config. Check for syntax errors.');
+    process.exit(1);
+  }
+
+  const { serverPath } = config;
+
+  const server = fastify({
+    logger: { level: process.env.ISMS_DEBUG ? 'debug' : 'info' },
+  });
+
+  server.addHook('onResponse', debug);
+  server.addHook('onResponse', ubidots);
+  server.addHook('onResponse', httpHook);
+  server.addHook('onResponse', homeAssistant);
 
   const opts = {
-    logger: { level: process.env.ISMS_DEBUG ? 'debug' : 'info' },
     schema: {
       body: {
         type: 'object',
@@ -23,7 +44,9 @@ export default async (): Promise<void> => {
     },
   };
 
-  const server = await app(opts);
+  server.get('/', async () => '🍺');
+  server.get(serverPath, async () => 'Data should be POSTed to this endpoint');
+  server.post(serverPath, opts, async () => 'ok');
 
   server.listen(port, '0.0.0.0', (err) => {
     if (err) {

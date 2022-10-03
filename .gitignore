@@ -1,4 +1,12 @@
 node_modules
 build
 config.json
-.nyc_output/
+.env
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+l

@@ -1,16 +1,17 @@
 import { FastifyRequest } from 'fastify';
-import axios, { AxiosRequestConfig } from 'axios';
-import { ServiceType } from '../config';
-import getServices from '../getServices';
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import getConfig, { Service } from '../config';
 import { IspindelData } from '../index.d';
+import isAxiosError from '../helpers';
 
 export default async (request: FastifyRequest): Promise<void> => {
-  const services = await getServices(request, ServiceType.HomeAssisstant);
-  if (!services) {
+  const config = await getConfig();
+  if (!config || !request.body) {
     return;
   }
 
+  const services = config.services.filter((service: Service) => service.type === 'homeassistant');
   const data: IspindelData = request.body as IspindelData;
 
   const postData = async (
@@ -42,16 +43,23 @@ export default async (request: FastifyRequest): Promise<void> => {
       );
       // eslint-disable-next-line no-console
       request.log.info(resData, `${status} response from ${url}`);
-    } catch (err) {
-      request.log.error(err, `Error from homeassistant at ${url} for device ${name}`);
+    } catch (err: unknown | AxiosError) {
+      if (isAxiosError(err) && err.response) {
+        request.log.error(err.response.data, `Error from homeassistant at ${url} for device ${deviceLabel}`);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(err);
+      }
     }
   };
 
-  services.forEach(async (service) => {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const service of services) {
     const { deviceLabel = data.name, url, token } = service;
     const axiosConfig: AxiosRequestConfig = {};
     if (!url) {
       request.log.error(`'url' not set for homeassistant service ${deviceLabel}. Data not sent.`);
+      break;
     }
 
     const {
@@ -65,5 +73,5 @@ export default async (request: FastifyRequest): Promise<void> => {
     postData(url, deviceLabel, 'battery', battery, 'Volts', token, axiosConfig);
     postData(url, deviceLabel, 'gravity', gravity, 'SG', token, axiosConfig);
     postData(url, deviceLabel, 'angle', angle, 'Degrees', token, axiosConfig);
-  });
+  }
 };

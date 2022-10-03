@@ -17,7 +17,7 @@
   "author": "Chris Scott",
   "license": "MIT",
   "dependencies": {
-    "axios": "0.26.0",
+    "axios": "0.27.2",
     "dotenv": "16.0.0",
     "envsub": "4.0.7",
     "fastify": "3.27.2"
@@ -31,7 +31,7 @@
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-airbnb-typescript": "16.1.0",
     "eslint-plugin-import": "2.25.4",
-    "nodemon": "2.0.15",
+    "nodemon": "2.0.20",
     "rimraf": "3.0.2",
     "tap": "15.1.6",
     "ts-node": "10.5.0",

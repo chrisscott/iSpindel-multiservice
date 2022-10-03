@@ -8,8 +8,19 @@
     },
     {
       "type": "http",
-      "deviceLabel": "${GRAINFATHER_LABEL}",
+      "deviceLabel": "iSpindel",
       "url": "http://community.grainfather.com/iot/${GRAINFATHER_ID}/ispindel"
+    },
+    {
+      "type": "http",
+      "deviceLabel": "iSpindel SG",
+      "url": "http://log.brewfather.net/ispindel?id=${BREWFATHER_ID}"
+    },
+    {
+      "type": "homeassistant",
+      "deviceLabel": "iSpindel",
+      "url": "${HOMEASSISTANT_URL}",
+      "token": "${HOMEASSISTANT_TOKEN}"
     },
     {
       "type": "http",

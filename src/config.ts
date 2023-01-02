@@ -1,5 +1,6 @@
 /// <reference types="./envsub" />
 import envsub from 'envsub';
+import fs from 'fs';
 
 export interface Service {
   type: string;
@@ -11,7 +12,7 @@ export interface Service {
 
 export interface Config {
   serverPath?: string;
-  services?: [Service];
+  services: [Service];
 }
 
 interface EnvsubResult {
@@ -21,14 +22,11 @@ interface EnvsubResult {
   outputContents: string;
 }
 
-const templateFile = `${__dirname}/../config.json`;
-
-export default async (): Promise<Config | null> => {
-  try {
-    const result: EnvsubResult = await envsub({ templateFile, outputFile: '/dev/null' });
-    const config: Config = JSON.parse(result.outputContents);
-    return config;
-  } catch (err) {
-    return null;
+export default async (templateFile = `${__dirname}/../../config.json`): Promise<Config> => {
+  if (!fs.existsSync(templateFile)) {
+    throw new Error(`Template file ${templateFile} does not exist.`);
   }
+  const result: EnvsubResult = await envsub({ templateFile, outputFile: '/dev/null' });
+  const config: Config = JSON.parse(result.outputContents);
+  return config;
 };

@@ -10,7 +10,7 @@ interface AppOptions extends FastifyServerOptions {
 }
 
 export default async (opts: AppOptions) => {
-  let config;
+  let config: Config;
   try {
     config = opts.config || await getConfig();
   } catch (err) {

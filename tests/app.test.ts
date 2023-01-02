@@ -6,6 +6,13 @@ test('requests the "/" route', async (t) => {
   const app = build({
     config: {
       serverPath: '/',
+      services: [
+        {
+          type: 'http',
+          deviceLabel: 'foo',
+          url: 'localhost',
+        },
+      ],
     },
   });
 

@@ -6,8 +6,15 @@ import { IspindelData } from '../index.d';
 import isAxiosError from '../helpers';
 
 export default async (request: FastifyRequest): Promise<void> => {
-  const config = await getConfig();
-  if (!config || !request.body) {
+  if (!request.body) {
+    return;
+  }
+
+  let config;
+
+  try {
+    config = await getConfig();
+  } catch (err) {
     return;
   }
 

@@ -15,8 +15,15 @@ interface UbiDotsData {
 }
 
 export default async (request: FastifyRequest): Promise<void> => {
-  const config = await getConfig();
-  if (!config || !request.body) {
+  if (!request.body) {
+    return;
+  }
+
+  let config;
+
+  try {
+    config = await getConfig();
+  } catch (err) {
     return;
   }
 

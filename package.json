@@ -6,7 +6,7 @@
   "scripts": {
     "build": "yarn tsc -p tsconfig.json",
     "prebuild": "rimraf build",
-    "start": "yarn build && node build/index.js",
+    "start": "yarn build && node build/src/index.js",
     "dev": "nodemon",
     "test": "tap --ts --reporter=list --watch"
   },
@@ -20,7 +20,7 @@
     "axios": "0.27.2",
     "dotenv": "16.0.0",
     "envsub": "4.0.7",
-    "fastify": "3.27.2"
+    "fastify": "3.29.4"
   },
   "devDependencies": {
     "@types/node": "17.0.18",

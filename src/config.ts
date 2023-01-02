@@ -22,10 +22,16 @@ interface EnvsubResult {
   outputContents: string;
 }
 
-export default async (templateFile = `${__dirname}/../../config.json`): Promise<Config> => {
+export default async (
+  templateFile = process.env.CONFIG_FILE_PATH
+    ? process.env.CONFIG_FILE_PATH
+    : `${__dirname}/../../config.json`,
+): Promise<Config> => {
   if (!fs.existsSync(templateFile)) {
     throw new Error(`Template file ${templateFile} does not exist.`);
   }
+  // eslint-disable-next-line no-console
+  console.log(`Using config file ${templateFile}`);
   const result: EnvsubResult = await envsub({ templateFile, outputFile: '/dev/null' });
   const config: Config = JSON.parse(result.outputContents);
   return config;

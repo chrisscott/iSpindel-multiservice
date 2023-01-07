@@ -8,7 +8,8 @@
     "prebuild": "rimraf build",
     "start": "yarn build && node build/src/index.js",
     "dev": "nodemon",
-    "test": "tap --ts --reporter=list --watch"
+    "test": "tap --ts --reporter=list --watch",
+    "release": "release-it"
   },
   "keywords": [
     "ispindel",

@@ -1,6 +1,6 @@
 {
   "name": "ispindel-multiservice",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Send iSpindel data to multiple services",
   "main": "build/index.js",
   "scripts": {

@@ -6,9 +6,7 @@ Send your [iSpindel](https://www.ispindel.de/docs/README_en.html) data to multip
 
 ## Configuration
 
-Create a `config.json` file in the root of this project to configure the services to send your iSpindel data to. See [`config.example.json`](./config.example.json) for reference.
-
-A minimal configuration to send iSpindel data to an http service would look something like:
+Configuration is stored in JSON format. A minimal configuration to send iSpindel data to an http service would look something like:
 
 ```json
 {
@@ -22,7 +20,11 @@ A minimal configuration to send iSpindel data to an http service would look some
 }
 ```
 
-When run the server would listen on the path `/mySpindel` and forward the iSpindel data to `http://example.com/endpoint`.
+In this example the server would listen on the path `/mySpindel` and forward the iSpindel data to `http://example.com/endpoint`.
+
+See [`config.example.json`](./config.example.json) for reference.
+
+By default, the server will look for a `config.json` file in the root of this project to configure the services to send your iSpindel data to. This can be overriden by setting the `CONFIG_FILE_PATH` to the full file system path of your configuration file.
 
 ### Primary Configuration Options
 
@@ -87,7 +89,7 @@ Provides a service you can point your iSpindel to which then forwards the data t
 ## Why would I need it?
 
 * You have an iSpindel and want to send data to Ubidots, Grainfather, Brewers Friend, a custom HTTP service, Home Assistant or more. 
-* You want to send iSpindel data to a service that only supports HTTPS,
+* You are on an old iSpindel firmware without HTTPS support want to send iSpindel data to a service that only supports HTTPS.
 
 ## Which services are supported?
 

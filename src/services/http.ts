@@ -28,7 +28,7 @@ export default async (request: FastifyRequest): Promise<void> => {
     axiosConfig: AxiosRequestConfig,
   ) => {
     try {
-      request.log.info(`Sending data to ${url} for device ${deviceLabel} `);
+      request.log.info(`Sending data to ${url} for device ${deviceLabel}: ${JSON.stringify(data)}`);
       const { status, data: resData } = await axios.post(
         url,
         data,
@@ -49,7 +49,7 @@ export default async (request: FastifyRequest): Promise<void> => {
   // eslint-disable-next-line max-len
   // eslint-disable-next-line no-restricted-syntax
   for (const service of services) {
-    const { url, headers = undefined } = service;
+    const { url, headers = undefined, deviceLabel } = service;
     const { name } = payload;
     const axiosConfig: AxiosRequestConfig = {};
     if (!url) {
@@ -60,6 +60,11 @@ export default async (request: FastifyRequest): Promise<void> => {
     if (headers) {
       axiosConfig.headers = headers;
     }
+
+    if (deviceLabel) {
+      payload.name = deviceLabel;
+    }
+
     postData(url, name, payload, axiosConfig);
   }
 };

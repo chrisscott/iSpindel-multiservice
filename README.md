@@ -35,7 +35,7 @@ By default, the server will look for a `config.json` file in the root of this pr
     * `ubidots` - Ubidots
     * `homeassistant` - Home Assistant
   * `url` (required) - the URL to send to
-  * `deviceLabel` (optional) - rename the device from what is configured in the iSpindel. Used for services like GrainFather which require a specific device name.
+  * `deviceLabel` (optional) - rename the device from what is configured in the iSpindel. Used for services like GrainFather and Brewfather which require a specific string in the name when using SG instead of Plato.
   * `headers` (optional) - a key-value object of headers and header values to send with the request
   * `token` (optional) - the API token to send in the request for supported services (currently only used for `ubidots` and `homeassistant`)
 
@@ -63,8 +63,8 @@ To allow this, we use [envsub](https://www.npmjs.com/package/envsub) for environ
 Deploy to your favorite node.js hosting service:
 
 ```
-npm install
-npm start
+yarn
+yarn start
 ```
 
 The server will listen on the port specified with the `PORT` environment variable or 8080 if not set.
@@ -74,8 +74,8 @@ The server will listen on the port specified with the `PORT` environment variabl
 ```
 git clone https://github.com/chrisscott/iSpindel-multiservice
 cd iSpindel-multiservice
-npm install
-npm run dev
+yarn install
+yarn run dev
 ```
 
 The server will listen on the port specified with the `PORT` environment variable or 8080 if not set.

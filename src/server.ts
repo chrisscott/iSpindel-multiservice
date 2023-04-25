@@ -48,7 +48,7 @@ export default async (): Promise<void> => {
   server.get(serverPath, async () => 'Data should be POSTed to this endpoint');
   server.post(serverPath, opts, async () => 'ok');
 
-  server.listen(port, '0.0.0.0', (err) => {
+  server.listen({ port }, (err) => {
     if (err) {
       server.log.error(err);
       process.exit(1);

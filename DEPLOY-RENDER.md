@@ -27,7 +27,6 @@ This file is git ignored and will not be stored in git but used later when setti
 ### Enviroment Variables 
 | Key                | Value                             |
 | ------------------ | --------------------------------- |
-| `NODE_VERSION`     | `14.8.0`                          |
 | `CONFIG_FILE_PATH` | `/etc/secrets/config.render.json` |
 
 ### Secret Files

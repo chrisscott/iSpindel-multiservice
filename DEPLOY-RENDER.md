@@ -25,9 +25,10 @@ This file is git ignored and will not be stored in git but used later when setti
 [Follow the Render docs](https://render.com/docs/web-services#deploying-from-a-git-repository) to create this. When you get to the end of Step 4, add the following Advanced settings:
 
 ### Enviroment Variables 
-| Key            | Value    |
-| -------------- | -------- |
-| `NODE_VERSION` | `14.8.0` |
+| Key                | Value                             |
+| ------------------ | --------------------------------- |
+| `NODE_VERSION`     | `14.8.0`                          |
+| `CONFIG_FILE_PATH` | `/etc/secrets/config.render.json` |
 
 ### Secret Files
 | Filename             | Contents                                    |

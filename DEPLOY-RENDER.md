@@ -22,7 +22,11 @@ Add a new file, `config.render.json` in the root of your forked repo and [add yo
 This file is git ignored and will not be stored in git but used later when setting up Render.
 
 ## Create a New Render Web Service
-[Follow the Render docs](https://render.com/docs/web-services#deploying-from-a-git-repository) to create this. When you get to the end of Step 4, add the following Advanced settings:
+[Follow the Render docs](https://render.com/docs/web-services#deploying-from-a-git-repository) to create a new web service. 
+
+Accept the defaults except for the **Start Command** which needs to be set to `yarn start`.
+
+When you get to the end of Step 4, add the following Advanced settings:
 
 ### Enviroment Variables 
 | Key                | Value                             |

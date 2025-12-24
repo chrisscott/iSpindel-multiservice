@@ -75,8 +75,8 @@ To allow this, we use [envsub](https://www.npmjs.com/package/envsub) for environ
 Deploy to your favorite node.js hosting service (see guide for [deploying to Render](./DEPLOY-RENDER.md)).
 
 ```
-yarn
-yarn start
+pnpm install
+pnpm start
 ```
 
 The server will listen on the port specified with the `PORT` environment variable or 8080 if not set.
@@ -86,8 +86,8 @@ The server will listen on the port specified with the `PORT` environment variabl
 ```
 git clone https://github.com/chrisscott/iSpindel-multiservice
 cd iSpindel-multiservice
-yarn install
-yarn run dev
+pnpm install
+pnpm dev
 ```
 
 The server will listen on the port specified with the `PORT` environment variable or 8080 if not set.

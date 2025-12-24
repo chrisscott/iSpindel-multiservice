@@ -67,8 +67,7 @@ export default async (request: FastifyRequest): Promise<void> => {
       if (isAxiosError(err) && err.response) {
         request.log.error(err.response.data, `Ubidots error for device ${name}`);
       } else {
-        // eslint-disable-next-line no-console
-        console.log(err);
+        request.log.error(err, `Unexpected error sending data to Ubidots for device ${name}`);
       }
     }
   });

@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+import { FastifyInstance } from 'fastify';
 import fastify from 'fastify';
 import getConfig from './config';
 import debug from './services/debug';
@@ -6,18 +6,27 @@ import ubidots from './services/ubidots';
 import httpHook from './services/http';
 import homeAssistant from './services/homeassistant';
 
-export default async (): Promise<void> => {
-  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
+export interface ServerOptions {
+  logger?: boolean | object;
+}
+
+/**
+ * Creates and configures the Fastify server instance
+ */
+export async function createServer(opts: ServerOptions = {}): Promise<FastifyInstance> {
   const config = await getConfig();
   if (!config?.serverPath) {
-    console.log('Error parsing config. Check for syntax errors.');
-    process.exit(1);
+    throw new Error('Error parsing config. Check for syntax errors. Missing serverPath.');
   }
 
   const { serverPath } = config;
 
+  const loggerConfig = opts.logger !== undefined
+    ? opts.logger
+    : { level: process.env.ISMS_DEBUG ? 'debug' : 'info' };
+
   const server = fastify({
-    logger: { level: process.env.ISMS_DEBUG ? 'debug' : 'info' },
+    logger: loggerConfig,
   });
 
   server.addHook('onResponse', debug);
@@ -25,7 +34,7 @@ export default async (): Promise<void> => {
   server.addHook('onResponse', httpHook);
   server.addHook('onResponse', homeAssistant);
 
-  const opts = {
+  const routeOpts = {
     schema: {
       body: {
         type: 'object',
@@ -46,7 +55,17 @@ export default async (): Promise<void> => {
 
   server.get('/', async () => '🍺');
   server.get(serverPath, async () => 'Data should be POSTed to this endpoint');
-  server.post(serverPath, opts, async () => 'ok');
+  server.post(serverPath, routeOpts, async () => 'ok');
+
+  return server;
+}
+
+/**
+ * Starts the server and listens on the configured port
+ */
+export default async (): Promise<void> => {
+  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
+  const server = await createServer();
 
   server.listen({ port, host: '::' }, (err) => {
     if (err) {

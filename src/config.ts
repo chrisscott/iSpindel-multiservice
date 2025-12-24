@@ -30,8 +30,7 @@ export default async (
   if (!fs.existsSync(templateFile)) {
     throw new Error(`Template file ${templateFile} does not exist.`);
   }
-  // eslint-disable-next-line no-console
-  console.log(`Using config file ${templateFile}`);
+  process.stdout.write(`Using config file ${templateFile}\n`);
   const result: EnvsubResult = await envsub({ templateFile, outputFile: '/dev/null' });
   const config: Config = JSON.parse(result.outputContents);
   return config;

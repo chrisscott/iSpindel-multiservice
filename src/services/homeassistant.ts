@@ -1,5 +1,4 @@
 import { FastifyRequest } from 'fastify';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import getConfig, { Service } from '../config';
 import { IspindelData } from '../index.d';
@@ -48,19 +47,16 @@ export default async (request: FastifyRequest): Promise<void> => {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      // eslint-disable-next-line no-console
       request.log.info(resData, `${status} response from ${url}`);
     } catch (err: unknown | AxiosError) {
       if (isAxiosError(err) && err.response) {
         request.log.error(err.response.data, `Error from homeassistant at ${url} for device ${deviceLabel}`);
       } else {
-        // eslint-disable-next-line no-console
-        console.log(err);
+        request.log.error(err, `Unexpected error sending data to homeassistant at ${url} for device ${deviceLabel}`);
       }
     }
   };
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const service of services) {
     const { deviceLabel = data.name, url, token } = service;
     const axiosConfig: AxiosRequestConfig = {};

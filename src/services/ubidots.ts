@@ -1,5 +1,4 @@
 import { FastifyRequest } from 'fastify';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import axios, { AxiosError } from 'axios';
 import getConfig, { Service } from '../config';
 import { IspindelData } from '../index.d';

@@ -1,4 +1,5 @@
 import { test } from 'tap';
+import path from 'path';
 import build from '../src/app';
 import getConfig from '../src/config';
 
@@ -25,5 +26,7 @@ test('requests the "/" route', async (t) => {
 });
 
 test('example config is valid', async (t) => {
-  t.doesNotThrow(() => getConfig(`${__dirname}/../config.example.json`), 'does not throw an exception');
+  // Use process.cwd() to get project root, works from both source and compiled locations
+  const configPath = path.join(process.cwd(), 'config.example.json');
+  t.doesNotThrow(() => getConfig(configPath), 'does not throw an exception');
 });

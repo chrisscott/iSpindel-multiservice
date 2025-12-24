@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { FastifyInstance } from 'fastify';
 import fastify from 'fastify';
 import getConfig from './config';
@@ -17,8 +16,7 @@ export interface ServerOptions {
 export async function createServer(opts: ServerOptions = {}): Promise<FastifyInstance> {
   const config = await getConfig();
   if (!config?.serverPath) {
-    console.log('Error parsing config. Check for syntax errors.');
-    process.exit(1);
+    throw new Error('Error parsing config. Check for syntax errors. Missing serverPath.');
   }
 
   const { serverPath } = config;

@@ -33,20 +33,16 @@ export default async (request: FastifyRequest): Promise<void> => {
         data,
         axiosConfig,
       );
-      // eslint-disable-next-line no-console
       request.log.info(resData, `${status} response from ${url}`);
     } catch (err: unknown | AxiosError) {
       if (isAxiosError(err) && err.response) {
         request.log.error(err.response.data, `http error from ${url} for device ${deviceLabel}`);
       } else {
-        // eslint-disable-next-line no-console
-        console.log(err);
+        request.log.error(err, `Unexpected error sending data to ${url} for device ${deviceLabel}`);
       }
     }
   };
 
-  // eslint-disable-next-line max-len
-  // eslint-disable-next-line no-restricted-syntax
   for (const service of services) {
     const { url, headers = undefined, deviceLabel } = service;
     const { name } = payload;

@@ -4,9 +4,9 @@
   "description": "Send iSpindel data to multiple services",
   "main": "build/index.js",
   "scripts": {
-    "build": "yarn tsc -p tsconfig.json",
+    "build": "pnpm tsc -p tsconfig.json",
     "prebuild": "rimraf build",
-    "start": "yarn build && node build/src/index.js",
+    "start": "pnpm build && node build/src/index.js",
     "dev": "nodemon",
     "test": "tap --ts --reporter=list --watch",
     "release": "dotenv release-it --"
@@ -28,6 +28,7 @@
     "@types/tap": "^15.0.9",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
+    "debug": "^4.3.4",
     "dotenv-cli": "^7.3.0",
     "eslint": "^8.49.0",
     "eslint-config-airbnb-base": "15.0.0",
@@ -44,8 +45,8 @@
     "watch": [
       "."
     ],
-    "exec": "npm run-script build && npm start",
+    "exec": "pnpm build && pnpm start",
     "ext": "ts"
   },
-  "packageManager": "yarn@3.2.3"
+  "packageManager": "pnpm@10.26.2+sha512.0e308ff2005fc7410366f154f625f6631ab2b16b1d2e70238444dd6ae9d630a8482d92a451144debc492416896ed16f7b114a86ec68b8404b2443869e68ffda6"
 }

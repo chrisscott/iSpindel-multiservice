@@ -24,7 +24,7 @@ This file is git ignored and will not be stored in git but used later when setti
 ## Create a New Render Web Service
 [Follow the Render docs](https://render.com/docs/web-services#deploying-from-a-git-repository) to create a new web service. 
 
-Accept the defaults except for the **Start Command** which needs to be set to `yarn start`.
+Accept the defaults except for the **Start Command** which needs to be set to `pnpm start`.
 
 When you get to the end of Step 4, add the following Advanced settings:
 

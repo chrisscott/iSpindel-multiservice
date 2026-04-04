@@ -1,7 +1,8 @@
 import { FastifyRequest } from 'fastify';
+import axios, { AxiosError } from 'axios';
 import getConfig, { Service } from '../config';
 import { IspindelData } from '../index.d';
-import { FetchError, isFetchError } from '../helpers';
+import isAxiosError from '../helpers';
 
 interface UbiDotsData {
   tilt: number;
@@ -55,24 +56,16 @@ export default async (request: FastifyRequest): Promise<void> => {
 
     try {
       request.log.info(`Sending data to Ubidots for device ${name}`);
-      const response = await fetch(
+      await axios.post(
         `https://things.ubidots.com/api/v1.6/devices/${name}`,
+        payload,
         {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Auth-Token': token,
-          },
-          body: JSON.stringify(payload),
+          headers: { 'X-Auth-Token': token },
         },
       );
-      if (!response.ok) {
-        const resData = await response.text();
-        throw new FetchError(response.status, resData);
-      }
-    } catch (err: unknown) {
-      if (isFetchError(err)) {
-        request.log.error(err.responseData, `Ubidots error for device ${name}`);
+    } catch (err: unknown | AxiosError) {
+      if (isAxiosError(err) && err.response) {
+        request.log.error(err.response.data, `Ubidots error for device ${name}`);
       } else {
         request.log.error(err, `Unexpected error sending data to Ubidots for device ${name}`);
       }

@@ -1,12 +1,8 @@
-export class FetchError extends Error {
-  status: number;
-  responseData: unknown;
+import { AxiosError } from 'axios';
 
-  constructor(status: number, responseData: unknown) {
-    super(`HTTP error ${status}`);
-    this.status = status;
-    this.responseData = responseData;
+export default (error: unknown | AxiosError) : error is AxiosError => {
+  if ((error as AxiosError).isAxiosError) {
+    return true;
   }
-}
-
-export const isFetchError = (error: unknown): error is FetchError => error instanceof FetchError;
+  return false;
+};

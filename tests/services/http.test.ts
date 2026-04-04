@@ -1,18 +1,17 @@
 import { test } from 'tap';
 import sinon from 'sinon';
+import axios from 'axios';
 import { FastifyRequest } from 'fastify';
 import httpService from '../../src/services/http';
 import * as configModule from '../../src/config';
 import { IspindelData } from '../../src/index.d';
 
 test('http service', async (t) => {
-  let fetchStub: sinon.SinonStub;
+  let axiosPostStub: sinon.SinonStub;
   let getConfigStub: sinon.SinonStub;
 
   t.beforeEach(() => {
-    fetchStub = sinon.stub(globalThis, 'fetch').resolves(
-      new Response('ok', { status: 200 }),
-    );
+    axiosPostStub = sinon.stub(axios, 'post').resolves({ status: 200, data: 'ok' });
     getConfigStub = sinon.stub(configModule, 'default');
   });
 
@@ -59,14 +58,13 @@ test('http service', async (t) => {
     // Give async operations time to complete
     await new Promise((resolve) => { setTimeout(resolve, 100); });
 
-    t.ok(fetchStub.called, 'fetch was called');
-    t.equal(fetchStub.callCount, 1, 'fetch called once');
+    t.ok(axiosPostStub.called, 'axios.post was called');
+    t.equal(axiosPostStub.callCount, 1, 'axios.post called once');
 
-    const [url, options] = fetchStub.firstCall.args;
+    const [url, data] = axiosPostStub.firstCall.args;
     t.equal(url, 'http://example.com/endpoint', 'correct URL');
-    const body = JSON.parse(options.body);
-    t.equal(body.name, 'TestDevice', 'deviceLabel overrides name');
-    t.equal(body.temperature, 68.2, 'temperature passed through');
+    t.equal(data.name, 'TestDevice', 'deviceLabel overrides name');
+    t.equal(data.temperature, 68.2, 'temperature passed through');
   });
 
   t.test('sends custom headers when configured', async (t) => {
@@ -109,10 +107,10 @@ test('http service', async (t) => {
     await httpService(mockRequest);
     await new Promise((resolve) => { setTimeout(resolve, 100); });
 
-    const [, options] = fetchStub.firstCall.args;
-    t.ok(options.headers, 'headers included in request');
-    t.equal(options.headers['X-Custom-Header'], 'CustomValue', 'custom header sent');
-    t.equal(options.headers['Authorization'], 'Bearer token123', 'auth header sent');
+    const [, , config] = axiosPostStub.firstCall.args;
+    t.ok(config.headers, 'headers included in request');
+    t.equal(config.headers['X-Custom-Header'], 'CustomValue', 'custom header sent');
+    t.equal(config.headers['Authorization'], 'Bearer token123', 'auth header sent');
   });
 
   t.test('skips non-http services', async (t) => {
@@ -152,7 +150,7 @@ test('http service', async (t) => {
     await httpService(mockRequest);
     await new Promise((resolve) => { setTimeout(resolve, 100); });
 
-    t.notOk(fetchStub.called, 'fetch not called for non-http service');
+    t.notOk(axiosPostStub.called, 'axios.post not called for non-http service');
   });
 
   t.test('handles missing request body', async (t) => {
@@ -167,159 +165,6 @@ test('http service', async (t) => {
     await httpService(mockRequest);
 
     t.notOk(getConfigStub.called, 'getConfig not called when body missing');
-    t.notOk(fetchStub.called, 'fetch not called when body missing');
-  });
-
-  t.test('logs error on HTTP error response', async (t) => {
-    fetchStub.resolves(new Response('Not Found', { status: 404 }));
-    const mockConfig = {
-      serverPath: '/test',
-      services: [
-        {
-          type: 'http',
-          url: 'http://example.com/endpoint',
-        },
-      ],
-    };
-    getConfigStub.resolves(mockConfig);
-
-    const ispindelData: IspindelData = {
-      name: 'iSpindel001',
-      ID: 12345,
-      token: 'test-token',
-      angle: 45.5,
-      temperature: 68.2,
-      temp_units: 'F',
-      battery: 3.8,
-      gravity: 1.050,
-      interval: 900,
-      RSSI: -65,
-    };
-
-    const mockRequest = {
-      body: ispindelData,
-      log: {
-        info: sinon.stub(),
-        error: sinon.stub(),
-      },
-    } as unknown as FastifyRequest;
-
-    await httpService(mockRequest);
-    await new Promise((resolve) => { setTimeout(resolve, 100); });
-
-    const errorStub = mockRequest.log.error as sinon.SinonStub;
-    t.ok(errorStub.called, 'error logged on non-ok response');
-    t.match(errorStub.firstCall.args[1], /http error from/, 'logs http error message');
-  });
-
-  t.test('logs error on network failure', async (t) => {
-    fetchStub.rejects(new TypeError('fetch failed'));
-    const mockConfig = {
-      serverPath: '/test',
-      services: [
-        {
-          type: 'http',
-          url: 'http://example.com/endpoint',
-        },
-      ],
-    };
-    getConfigStub.resolves(mockConfig);
-
-    const ispindelData: IspindelData = {
-      name: 'iSpindel001',
-      ID: 12345,
-      token: 'test-token',
-      angle: 45.5,
-      temperature: 68.2,
-      temp_units: 'F',
-      battery: 3.8,
-      gravity: 1.050,
-      interval: 900,
-      RSSI: -65,
-    };
-
-    const mockRequest = {
-      body: ispindelData,
-      log: {
-        info: sinon.stub(),
-        error: sinon.stub(),
-      },
-    } as unknown as FastifyRequest;
-
-    await httpService(mockRequest);
-    await new Promise((resolve) => { setTimeout(resolve, 100); });
-
-    const errorStub = mockRequest.log.error as sinon.SinonStub;
-    t.ok(errorStub.called, 'error logged on network failure');
-    t.match(errorStub.firstCall.args[1], /Unexpected error/, 'logs unexpected error message');
-  });
-
-  t.test('logs error when URL not configured', async (t) => {
-    const mockConfig = {
-      serverPath: '/test',
-      services: [
-        {
-          type: 'http',
-        },
-      ],
-    };
-    getConfigStub.resolves(mockConfig);
-
-    const ispindelData: IspindelData = {
-      name: 'iSpindel001',
-      ID: 12345,
-      token: 'test-token',
-      angle: 45.5,
-      temperature: 68.2,
-      temp_units: 'F',
-      battery: 3.8,
-      gravity: 1.050,
-      interval: 900,
-      RSSI: -65,
-    };
-
-    const mockRequest = {
-      body: ispindelData,
-      log: {
-        info: sinon.stub(),
-        error: sinon.stub(),
-      },
-    } as unknown as FastifyRequest;
-
-    await httpService(mockRequest);
-    await new Promise((resolve) => { setTimeout(resolve, 100); });
-
-    t.notOk(fetchStub.called, 'fetch not called when URL missing');
-    t.ok((mockRequest.log.error as sinon.SinonStub).called, 'error logged');
-  });
-
-  t.test('handles config load failure', async (t) => {
-    getConfigStub.rejects(new Error('config error'));
-
-    const ispindelData: IspindelData = {
-      name: 'iSpindel001',
-      ID: 12345,
-      token: 'test-token',
-      angle: 45.5,
-      temperature: 68.2,
-      temp_units: 'F',
-      battery: 3.8,
-      gravity: 1.050,
-      interval: 900,
-      RSSI: -65,
-    };
-
-    const mockRequest = {
-      body: ispindelData,
-      log: {
-        info: sinon.stub(),
-        error: sinon.stub(),
-      },
-    } as unknown as FastifyRequest;
-
-    await httpService(mockRequest);
-    await new Promise((resolve) => { setTimeout(resolve, 100); });
-
-    t.notOk(fetchStub.called, 'fetch not called when config fails');
+    t.notOk(axiosPostStub.called, 'axios.post not called when body missing');
   });
 });

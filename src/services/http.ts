@@ -1,7 +1,8 @@
 import { FastifyRequest } from 'fastify';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import getConfig, { Service } from '../config';
 import { IspindelData } from '../index.d';
-import { FetchError, isFetchError } from '../helpers';
+import isAxiosError from '../helpers';
 
 export default async (request: FastifyRequest): Promise<void> => {
   if (!request.body) {
@@ -23,23 +24,19 @@ export default async (request: FastifyRequest): Promise<void> => {
     url: string,
     deviceLabel: string,
     data: IspindelData,
-    headers: Record<string, string>,
+    axiosConfig: AxiosRequestConfig,
   ) => {
     try {
       request.log.info(`Sending data to ${url} for device ${deviceLabel}: ${JSON.stringify(data)}`);
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...headers },
-        body: JSON.stringify(data),
-      });
-      const resData = await response.text();
-      if (!response.ok) {
-        throw new FetchError(response.status, resData);
-      }
-      request.log.info(`${response.status} response from ${url}: ${resData}`);
-    } catch (err: unknown) {
-      if (isFetchError(err)) {
-        request.log.error(err.responseData, `http error from ${url} for device ${deviceLabel}`);
+      const { status, data: resData } = await axios.post(
+        url,
+        data,
+        axiosConfig,
+      );
+      request.log.info(resData, `${status} response from ${url}`);
+    } catch (err: unknown | AxiosError) {
+      if (isAxiosError(err) && err.response) {
+        request.log.error(err.response.data, `http error from ${url} for device ${deviceLabel}`);
       } else {
         request.log.error(err, `Unexpected error sending data to ${url} for device ${deviceLabel}`);
       }
@@ -47,17 +44,22 @@ export default async (request: FastifyRequest): Promise<void> => {
   };
 
   for (const service of services) {
-    const { url, headers = {}, deviceLabel } = service;
+    const { url, headers = undefined, deviceLabel } = service;
     const { name } = payload;
+    const axiosConfig: AxiosRequestConfig = {};
     if (!url) {
       request.log.error(`'url' not set for http service ${name}. Data not sent.`);
       return;
+    }
+
+    if (headers) {
+      axiosConfig.headers = headers;
     }
 
     if (deviceLabel) {
       payload.name = deviceLabel;
     }
 
-    postData(url, name, payload, headers as Record<string, string>);
+    postData(url, name, payload, axiosConfig);
   }
 };

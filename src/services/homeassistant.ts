@@ -1,8 +1,7 @@
 import { FastifyRequest } from 'fastify';
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import getConfig, { Service } from '../config';
 import { IspindelData } from '../index.d';
-import isAxiosError from '../helpers';
+import { FetchError, isFetchError } from '../helpers';
 
 export default async (request: FastifyRequest): Promise<void> => {
   if (!request.body) {
@@ -27,7 +26,6 @@ export default async (request: FastifyRequest): Promise<void> => {
     state: unknown,
     unitOfMeasurement: string,
     token: string | undefined,
-    axiosConfig: AxiosRequestConfig,
   ) => {
     const payload = {
       state,
@@ -39,18 +37,25 @@ export default async (request: FastifyRequest): Promise<void> => {
 
     request.log.info(`Sending data to homeassistant at ${url} for device ${deviceLabel} for state ${stateName} `);
     try {
-      const { status, data: resData } = await axios.post(
+      const response = await fetch(
         `${url}/api/states/sensor.${deviceLabel}_${stateName}`,
-        payload,
         {
-          ...axiosConfig,
-          headers: { Authorization: `Bearer ${token}` },
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
         },
       );
-      request.log.info(resData, `${status} response from ${url}`);
-    } catch (err: unknown | AxiosError) {
-      if (isAxiosError(err) && err.response) {
-        request.log.error(err.response.data, `Error from homeassistant at ${url} for device ${deviceLabel}`);
+      const resData = await response.text();
+      if (!response.ok) {
+        throw new FetchError(response.status, resData);
+      }
+      request.log.info(`${response.status} response from ${url}: ${resData}`);
+    } catch (err: unknown) {
+      if (isFetchError(err)) {
+        request.log.error(err.responseData, `Error from homeassistant at ${url} for device ${deviceLabel}`);
       } else {
         request.log.error(err, `Unexpected error sending data to homeassistant at ${url} for device ${deviceLabel}`);
       }
@@ -59,7 +64,6 @@ export default async (request: FastifyRequest): Promise<void> => {
 
   for (const service of services) {
     const { deviceLabel = data.name, url, token } = service;
-    const axiosConfig: AxiosRequestConfig = {};
     if (!url) {
       request.log.error(`'url' not set for homeassistant service ${deviceLabel}. Data not sent.`);
       break;
@@ -72,9 +76,9 @@ export default async (request: FastifyRequest): Promise<void> => {
       angle,
     } = data;
 
-    postData(url, deviceLabel, 'temperature', temperature, '°F', token, axiosConfig);
-    postData(url, deviceLabel, 'battery', battery, 'Volts', token, axiosConfig);
-    postData(url, deviceLabel, 'gravity', gravity, 'SG', token, axiosConfig);
-    postData(url, deviceLabel, 'angle', angle, 'Degrees', token, axiosConfig);
+    postData(url, deviceLabel, 'temperature', temperature, '°F', token);
+    postData(url, deviceLabel, 'battery', battery, 'Volts', token);
+    postData(url, deviceLabel, 'gravity', gravity, 'SG', token);
+    postData(url, deviceLabel, 'angle', angle, 'Degrees', token);
   }
 };

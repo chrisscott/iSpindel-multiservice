@@ -53,14 +53,17 @@ export default async (request: FastifyRequest): Promise<void> => {
 
       try {
         request.log.info(`Sending data to Ubidots for device ${name}`);
-        const response = await fetch(`https://things.ubidots.com/api/v1.6/devices/${name}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Auth-Token": token,
+        const response = await fetch(
+          `https://things.ubidots.com/api/v1.6/devices/${encodeURIComponent(name)}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Auth-Token": token,
+            },
+            body: JSON.stringify(payload),
           },
-          body: JSON.stringify(payload),
-        });
+        );
         if (!response.ok) {
           const resData = await response.text();
           throw new FetchError(response.status, resData);

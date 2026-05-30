@@ -179,6 +179,58 @@ test("homeassistant service", async (t) => {
     t.match(firstCall, /sensor\.iSpindel001_/, "uses iSpindel name when deviceLabel not provided");
   });
 
+  t.test("encodes device name to prevent path traversal", async (t) => {
+    const mockConfig = {
+      serverPath: "/test",
+      services: [
+        {
+          type: "homeassistant",
+          url: "http://homeassistant.local:8123",
+          token: "ha-token-123",
+        },
+      ],
+    };
+    getConfigStub.resolves(mockConfig);
+
+    // Malicious name attempting to escape /api/states/sensor.* and reach the
+    // privileged service-call endpoint via path traversal + fragment.
+    const ispindelData: IspindelData = {
+      name: "x/../../services/light/turn_on#",
+      ID: 12345,
+      token: "test-token",
+      angle: 45.5,
+      temperature: 68.2,
+      temp_units: "F",
+      battery: 3.8,
+      gravity: 1.05,
+      interval: 900,
+      RSSI: -65,
+    };
+
+    const mockRequest = {
+      body: ispindelData,
+      log: {
+        info: sinon.stub(),
+        error: sinon.stub(),
+      },
+    } as unknown as FastifyRequest;
+
+    await homeAssistantService(mockRequest);
+
+    fetchStub.getCalls().forEach((call) => {
+      const requestUrl = call.args[0];
+      // The traversal characters must be percent-encoded, not interpolated raw.
+      t.notMatch(requestUrl, /\.\.\//, "raw '../' traversal sequence not present in URL");
+      // After WHATWG URL normalization, the request must stay under /api/states/.
+      const { pathname } = new URL(requestUrl);
+      t.ok(
+        pathname.startsWith("/api/states/sensor."),
+        `request stays under /api/states/ (got ${pathname})`,
+      );
+      t.notMatch(pathname, /\/api\/services\//, "cannot reach the service-call endpoint");
+    });
+  });
+
   t.test("logs error when URL not configured", async (t) => {
     const mockConfig = {
       serverPath: "/test",
@@ -386,6 +438,10 @@ test("homeassistant service", async (t) => {
     t.notOk(fetchStub.called, "fetch not called when config fails");
     const errorStub = mockRequest.log.error as sinon.SinonStub;
     t.ok(errorStub.called, "error logged when config fails to load");
-    t.match(errorStub.firstCall.args[1], /Failed to load config/, "logs config load failure message");
+    t.match(
+      errorStub.firstCall.args[1],
+      /Failed to load config/,
+      "logs config load failure message",
+    );
   });
 });

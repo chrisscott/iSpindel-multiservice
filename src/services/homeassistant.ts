@@ -40,14 +40,17 @@ export default async (request: FastifyRequest): Promise<void> => {
       `Sending data to homeassistant at ${url} for device ${deviceLabel} for state ${stateName} `,
     );
     try {
-      const response = await fetch(`${url}/api/states/sensor.${deviceLabel}_${stateName}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${url}/api/states/sensor.${encodeURIComponent(deviceLabel)}_${stateName}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+      );
       const resData = await response.text();
       if (!response.ok) {
         throw new FetchError(response.status, resData);

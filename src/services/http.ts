@@ -1,7 +1,7 @@
-import { FastifyRequest } from 'fastify';
-import getConfig, { Service } from '../config';
-import { IspindelData } from '../index.d';
-import { FetchError, isFetchError } from '../helpers';
+import { FastifyRequest } from "fastify";
+import getConfig, { Service } from "../config";
+import { IspindelData } from "../index.d";
+import { FetchError, isFetchError } from "../helpers";
 
 export default async (request: FastifyRequest): Promise<void> => {
   if (!request.body) {
@@ -13,10 +13,11 @@ export default async (request: FastifyRequest): Promise<void> => {
   try {
     config = await getConfig();
   } catch (err) {
+    request.log.error(err, "Failed to load config in http hook");
     return;
   }
 
-  const services = config.services.filter((service: Service) => service.type === 'http');
+  const services = config.services.filter((service: Service) => service.type === "http");
   const payload: IspindelData = request.body as IspindelData;
 
   const postData = async (
@@ -28,8 +29,8 @@ export default async (request: FastifyRequest): Promise<void> => {
     try {
       request.log.info(`Sending data to ${url} for device ${deviceLabel}: ${JSON.stringify(data)}`);
       const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...headers },
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...headers },
         body: JSON.stringify(data),
       });
       const resData = await response.text();
@@ -46,6 +47,7 @@ export default async (request: FastifyRequest): Promise<void> => {
     }
   };
 
+  const tasks: Promise<void>[] = [];
   for (const service of services) {
     const { url, headers = {}, deviceLabel } = service;
     const { name } = payload;
@@ -58,6 +60,7 @@ export default async (request: FastifyRequest): Promise<void> => {
       payload.name = deviceLabel;
     }
 
-    postData(url, name, payload, headers as Record<string, string>);
+    tasks.push(postData(url, name, payload, headers as Record<string, string>));
   }
+  await Promise.all(tasks);
 };

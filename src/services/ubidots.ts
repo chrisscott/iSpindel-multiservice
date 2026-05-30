@@ -1,7 +1,7 @@
-import { FastifyRequest } from 'fastify';
-import getConfig, { Service } from '../config';
-import { IspindelData } from '../index.d';
-import { FetchError, isFetchError } from '../helpers';
+import { FastifyRequest } from "fastify";
+import getConfig, { Service } from "../config";
+import { IspindelData } from "../index.d";
+import { FetchError, isFetchError } from "../helpers";
 
 interface UbiDotsData {
   tilt: number;
@@ -22,19 +22,14 @@ export default async (request: FastifyRequest): Promise<void> => {
   try {
     config = await getConfig();
   } catch (err) {
+    request.log.error(err, "Failed to load config in ubidots hook");
     return;
   }
 
-  const services = config.services.filter((service: Service) => service.type === 'ubidots');
+  const services = config.services.filter((service: Service) => service.type === "ubidots");
   const data: IspindelData = request.body as IspindelData;
 
-  const {
-    temperature,
-    battery,
-    gravity,
-    interval,
-    RSSI,
-  } = data;
+  const { temperature, battery, gravity, interval, RSSI } = data;
 
   const payload: UbiDotsData = {
     tilt: data.angle,
@@ -45,37 +40,38 @@ export default async (request: FastifyRequest): Promise<void> => {
     RSSI,
   };
 
-  services.forEach(async (service: Service) => {
-    const { deviceLabel: name = data.name, token } = service;
+  await Promise.all(
+    services.map(async (service: Service) => {
+      const { deviceLabel: name = data.name, token } = service;
 
-    if (!token) {
-      request.log.error(`Ubidots service for ${name} does not have a token in config.json or env. Skipping service.`);
-      return;
-    }
+      if (!token) {
+        request.log.error(
+          `Ubidots service for ${name} does not have a token in config.json or env. Skipping service.`,
+        );
+        return;
+      }
 
-    try {
-      request.log.info(`Sending data to Ubidots for device ${name}`);
-      const response = await fetch(
-        `https://things.ubidots.com/api/v1.6/devices/${name}`,
-        {
-          method: 'POST',
+      try {
+        request.log.info(`Sending data to Ubidots for device ${name}`);
+        const response = await fetch(`https://things.ubidots.com/api/v1.6/devices/${name}`, {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'X-Auth-Token': token,
+            "Content-Type": "application/json",
+            "X-Auth-Token": token,
           },
           body: JSON.stringify(payload),
-        },
-      );
-      if (!response.ok) {
-        const resData = await response.text();
-        throw new FetchError(response.status, resData);
+        });
+        if (!response.ok) {
+          const resData = await response.text();
+          throw new FetchError(response.status, resData);
+        }
+      } catch (err: unknown) {
+        if (isFetchError(err)) {
+          request.log.error(err.responseData, `Ubidots error for device ${name}`);
+        } else {
+          request.log.error(err, `Unexpected error sending data to Ubidots for device ${name}`);
+        }
       }
-    } catch (err: unknown) {
-      if (isFetchError(err)) {
-        request.log.error(err.responseData, `Ubidots error for device ${name}`);
-      } else {
-        request.log.error(err, `Unexpected error sending data to Ubidots for device ${name}`);
-      }
-    }
-  });
+    }),
+  );
 };

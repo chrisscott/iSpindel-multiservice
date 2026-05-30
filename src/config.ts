@@ -1,13 +1,13 @@
 /// <reference types="./envsub" />
-import envsub from 'envsub';
-import fs from 'fs';
+import envsub from "envsub";
+import fs from "fs";
 
 export interface Service {
   type: string;
   deviceLabel?: string;
   token?: string;
   url: string;
-  headers?: { [key: string]: string }
+  headers?: { [key: string]: string };
 }
 
 export interface Config {
@@ -31,7 +31,7 @@ export default async (
     throw new Error(`Template file ${templateFile} does not exist.`);
   }
   process.stdout.write(`Using config file ${templateFile}\n`);
-  const result: EnvsubResult = await envsub({ templateFile, outputFile: '/dev/null' });
+  const result: EnvsubResult = await envsub({ templateFile, outputFile: "/dev/null" });
   const config: Config = JSON.parse(result.outputContents);
   return config;
 };

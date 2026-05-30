@@ -1,7 +1,7 @@
-import { FastifyRequest } from 'fastify';
-import getConfig, { Service } from '../config';
-import { IspindelData } from '../index.d';
-import { FetchError, isFetchError } from '../helpers';
+import { FastifyRequest } from "fastify";
+import getConfig, { Service } from "../config";
+import { IspindelData } from "../index.d";
+import { FetchError, isFetchError } from "../helpers";
 
 export default async (request: FastifyRequest): Promise<void> => {
   if (!request.body) {
@@ -13,10 +13,11 @@ export default async (request: FastifyRequest): Promise<void> => {
   try {
     config = await getConfig();
   } catch (err) {
+    request.log.error(err, "Failed to load config in homeassistant hook");
     return;
   }
 
-  const services = config.services.filter((service: Service) => service.type === 'homeassistant');
+  const services = config.services.filter((service: Service) => service.type === "homeassistant");
   const data: IspindelData = request.body as IspindelData;
 
   const postData = async (
@@ -35,19 +36,18 @@ export default async (request: FastifyRequest): Promise<void> => {
       },
     };
 
-    request.log.info(`Sending data to homeassistant at ${url} for device ${deviceLabel} for state ${stateName} `);
+    request.log.info(
+      `Sending data to homeassistant at ${url} for device ${deviceLabel} for state ${stateName} `,
+    );
     try {
-      const response = await fetch(
-        `${url}/api/states/sensor.${deviceLabel}_${stateName}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
+      const response = await fetch(`${url}/api/states/sensor.${deviceLabel}_${stateName}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify(payload),
+      });
       const resData = await response.text();
       if (!response.ok) {
         throw new FetchError(response.status, resData);
@@ -55,13 +55,20 @@ export default async (request: FastifyRequest): Promise<void> => {
       request.log.info(`${response.status} response from ${url}: ${resData}`);
     } catch (err: unknown) {
       if (isFetchError(err)) {
-        request.log.error(err.responseData, `Error from homeassistant at ${url} for device ${deviceLabel}`);
+        request.log.error(
+          err.responseData,
+          `Error from homeassistant at ${url} for device ${deviceLabel}`,
+        );
       } else {
-        request.log.error(err, `Unexpected error sending data to homeassistant at ${url} for device ${deviceLabel}`);
+        request.log.error(
+          err,
+          `Unexpected error sending data to homeassistant at ${url} for device ${deviceLabel}`,
+        );
       }
     }
   };
 
+  const tasks: Promise<void>[] = [];
   for (const service of services) {
     const { deviceLabel = data.name, url, token } = service;
     if (!url) {
@@ -69,16 +76,12 @@ export default async (request: FastifyRequest): Promise<void> => {
       break;
     }
 
-    const {
-      temperature,
-      battery,
-      gravity,
-      angle,
-    } = data;
+    const { temperature, battery, gravity, angle } = data;
 
-    postData(url, deviceLabel, 'temperature', temperature, '°F', token);
-    postData(url, deviceLabel, 'battery', battery, 'Volts', token);
-    postData(url, deviceLabel, 'gravity', gravity, 'SG', token);
-    postData(url, deviceLabel, 'angle', angle, 'Degrees', token);
+    tasks.push(postData(url, deviceLabel, "temperature", temperature, "°F", token));
+    tasks.push(postData(url, deviceLabel, "battery", battery, "Volts", token));
+    tasks.push(postData(url, deviceLabel, "gravity", gravity, "SG", token));
+    tasks.push(postData(url, deviceLabel, "angle", angle, "Degrees", token));
   }
+  await Promise.all(tasks);
 };

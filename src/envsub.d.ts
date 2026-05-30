@@ -1,1 +1,1 @@
-declare module 'envsub';
+declare module "envsub";

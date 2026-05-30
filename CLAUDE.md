@@ -9,6 +9,7 @@ iSpindel Multiservice is a TypeScript/Node.js server that receives data from iSp
 ## Common Commands
 
 ### Development
+
 ```bash
 pnpm install          # Install dependencies
 pnpm dev              # Run in development mode with nodemon (auto-rebuilds on .ts changes)
@@ -17,16 +18,19 @@ pnpm start            # Build and run production server
 ```
 
 ### Testing
+
 ```bash
 pnpm test             # Build and run all tests with tap
 ```
 
 ### Linting & Release
+
 ```bash
 pnpm release          # Create a new release (requires .env with release-it config)
 ```
 
 ### Environment Variables
+
 - `PORT` - Server port (default: 8080)
 - `CONFIG_FILE_PATH` - Path to config file (default: ./config.json)
 - `ISMS_DEBUG` - Enable debug logging when set
@@ -34,6 +38,7 @@ pnpm release          # Create a new release (requires .env with release-it conf
 ## Architecture
 
 ### Request Flow
+
 1. iSpindel POSTs JSON data to configured `serverPath` endpoint (e.g., `/mySpindel`)
 2. Fastify server receives request and validates against schema (src/server.ts:28-45)
 3. Multiple Fastify `onResponse` hooks execute in parallel, each filtering for their service type
@@ -42,16 +47,19 @@ pnpm release          # Create a new release (requires .env with release-it conf
 ### Core Components
 
 **Entry Point** (src/index.ts → src/server.ts)
+
 - Loads dotenv and starts Fastify server on IPv6 `::` (falls back to IPv4)
 - Defines iSpindel data schema with properties: name, ID, token, temperature, temp_units, battery, gravity, interval, RSSI
 
 **Configuration** (src/config.ts)
+
 - Uses envsub to substitute `${ENV_VAR}` placeholders in config.json at runtime
 - Returns parsed Config with serverPath and services array
 - Supports sensitive data via environment variables (recommended for tokens/URLs)
 
-**Service Hooks** (src/services/*.ts)
+**Service Hooks** (src/services/\*.ts)
 All services follow the same pattern:
+
 1. Implemented as Fastify `onResponse` hooks that execute after response is sent
 2. Filter config.services for their specific type ('http', 'ubidots', 'homeassistant')
 3. Transform IspindelData to service-specific payload format
@@ -77,12 +85,14 @@ All services follow the same pattern:
 The project uses tap framework with TypeScript support and sinon for mocking. Tests are organized into two categories:
 
 ### Integration Tests (tests/server.test.ts)
+
 - Tests the full HTTP request/response cycle using `config.test.json`
 - Uses `createServer()` export from src/server.ts to create testable Fastify instances
 - Tests route handling (GET /, GET /brew, POST /brew)
 - Validates that config files load correctly
 
-### Unit Tests (tests/services/*.test.ts)
+### Unit Tests (tests/services/\*.test.ts)
+
 - Tests each service hook in isolation
 - Mocks axios to avoid real HTTP requests
 - Mocks getConfig to provide test configurations
@@ -90,6 +100,7 @@ The project uses tap framework with TypeScript support and sinon for mocking. Te
 - Tests error handling and missing token scenarios
 
 **Key Testing Patterns:**
+
 - Use `createServer({ logger: false })` for integration tests to suppress logs
 - Mock axios at module level with sinon stubs
 - Add 100ms delay after service calls (`await new Promise(resolve => setTimeout(resolve, 100))`) to allow async hooks to complete
@@ -99,6 +110,7 @@ The project uses tap framework with TypeScript support and sinon for mocking. Te
 ## Configuration Structure
 
 See config.example.json for reference. Each service object requires:
+
 - `type`: 'http' | 'ubidots' | 'homeassistant'
 - `url`: Target endpoint (supports ${ENV_VAR} substitution)
 - `token`: API token for ubidots/homeassistant (optional for http)

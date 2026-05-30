@@ -13,7 +13,6 @@ Send your [iSpindel](https://www.ispindel.de/docs/README_en.html) data to multip
   - [Why would I need it?](#why-would-i-need-it)
   - [Which services are supported?](#which-services-are-supported)
 
-
 ## Usage
 
 ### Configuration
@@ -40,16 +39,16 @@ By default, the server will look for a `config.json` file in the root of this pr
 
 #### Primary Configuration Options
 
-* `serverPath` (optional) - the path for the server. If ommitted, the server will listen at the root.
-* `services` (required) - an array of service objects (see [`config.example.json`](./config.example.json)):
-  * `type` (required) - one of:
-    * `http` - the main service which can be used to send data over HTTP or HTTPS:
-    * `ubidots` - Ubidots
-    * `homeassistant` - Home Assistant
-  * `url` (required) - the URL to send to
-  * `deviceLabel` (optional) - rename the device from what is configured in the iSpindel. Used for services like GrainFather and Brewfather which require a specific string in the name when using SG instead of Plato.
-  * `headers` (optional) - a key-value object of headers and header values to send with the request
-  * `token` (optional) - the API token to send in the request for supported services (currently only used for `ubidots` and `homeassistant`)
+- `serverPath` (optional) - the path for the server. If ommitted, the server will listen at the root.
+- `services` (required) - an array of service objects (see [`config.example.json`](./config.example.json)):
+  - `type` (required) - one of:
+    - `http` - the main service which can be used to send data over HTTP or HTTPS:
+    - `ubidots` - Ubidots
+    - `homeassistant` - Home Assistant
+  - `url` (required) - the URL to send to
+  - `deviceLabel` (optional) - rename the device from what is configured in the iSpindel. Used for services like GrainFather and Brewfather which require a specific string in the name when using SG instead of Plato.
+  - `headers` (optional) - a key-value object of headers and header values to send with the request
+  - `token` (optional) - the API token to send in the request for supported services (currently only used for `ubidots` and `homeassistant`)
 
 #### Using Environment Variables in `config.json`
 
@@ -100,15 +99,16 @@ Provides a service you can point your iSpindel to which then forwards the data t
 
 ### Why would I need it?
 
-* You have an iSpindel and want to send data to Ubidots, Grainfather, Brewers Friend, a custom HTTP service, Home Assistant or more. 
-* You are on an old iSpindel firmware without HTTPS support want to send iSpindel data to a service that only supports HTTPS.
+- You have an iSpindel and want to send data to Ubidots, Grainfather, Brewers Friend, a custom HTTP service, Home Assistant or more.
+- You are on an old iSpindel firmware without HTTPS support want to send iSpindel data to a service that only supports HTTPS.
 
 ### Which services are supported?
 
 Currently, the following:
-* HTTP - any HTTP or HTTPS endpoint
-  * Header-based token authentication is supported
-* Ubidots
-* Home Assistant
+
+- HTTP - any HTTP or HTTPS endpoint
+  - Header-based token authentication is supported
+- Ubidots
+- Home Assistant
 
 If there is a service missing you'd like to see, please [submit an issue](/issue/new) with the details.

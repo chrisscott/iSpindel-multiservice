@@ -306,6 +306,10 @@ test("ubidots service", async (t) => {
     t.notOk(fetchStub.called, "fetch not called when config fails");
     const errorStub = mockRequest.log.error as sinon.SinonStub;
     t.ok(errorStub.called, "error logged when config fails to load");
-    t.match(errorStub.firstCall.args[1], /Failed to load config/, "logs config load failure message");
+    t.match(
+      errorStub.firstCall.args[1],
+      /Failed to load config/,
+      "logs config load failure message",
+    );
   });
 });
